@@ -18,9 +18,11 @@ document
 
 
 const productId = getParam('product');
-async function logProduct() {
+console.log("Product ID from URL:", productId);
+
+async function loadProduct() {
   const product = await findProductById(productId);
   console.log(product);
 }
 
-logProduct();
+loadProduct();
