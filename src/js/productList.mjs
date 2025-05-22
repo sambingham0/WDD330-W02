@@ -1,5 +1,5 @@
 import { getData } from "./productData.mjs";
-import { renderListWithTemplate } from "./utils.mjs";
+import { renderWithTemplate } from "./utils.mjs";
 
 function productCardTemplate(product) {
   return `<li class="product-card">
@@ -20,11 +20,24 @@ export default async function productList(selector, category) {
   // get the list of products
   let products = await getData(category);
 
+  // Log all products to verify data
+  console.log("All products:", products);
+
   //only show the 4 tents we need
   const allowedIds = ["880RR", "985RF", "344YJ", "985PR"];
   products = products.filter(product => allowedIds.includes(product.Id));
 
+
+  // Log products missing Brand or Brand.Name
+  products.forEach(product => {
+    if (!product.Brand || !product.Brand.Name) {
+      console.log("Missing Brand or Brand.Name:", product);
+    }
+  });
+
   // render out the product list to the element
-  renderListWithTemplate(productCardTemplate, el, products);
+  products.forEach(product => {
+    renderWithTemplate(productCardTemplate, el, product);
+  });
 }
 
