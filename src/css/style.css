@@ -166,6 +166,30 @@ button {
   width: 100%;
 }
 
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+  max-width: 600px;
+  justify-items: center;
+}
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+.label {
+  font-size: 1rem;
+  text-align: center;
+}
+
 /* Start cart list card styles */
 .cart-card {
   display: grid;
