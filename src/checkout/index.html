@@ -8,7 +8,7 @@
 
     <title>Sleep Outside | Checkout</title>
 
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="../css/style.css" />
   </head>
 
   <body>
@@ -17,9 +17,85 @@
     <main class="divider">
       <section class="products">
         <h2>Review & Place your Order</h2>
+        
+        <div class="checkout-container">
+          <!-- Order Summary Section -->
+          <section class="order-summary">
+            <h3>Order Summary</h3>
+            <div id="order-items"></div>
+            <div class="order-totals">
+              <p>Subtotal: <span id="order-subtotal">$0.00</span></p>
+              <p>Shipping: <span id="order-shipping">$10.00</span></p>
+              <p>Tax: <span id="order-tax">$0.00</span></p>
+              <p class="order-total">Total: <span id="order-total">$0.00</span></p>
+            </div>
+          </section>
+
+          <!-- Checkout Form -->
+          <form id="checkout-form" class="checkout-form">
+            <fieldset>
+              <legend>Shipping Information</legend>
+              
+              <label for="fname">
+                First Name*
+                <input type="text" id="fname" name="fname" required>
+              </label>
+              
+              <label for="lname">
+                Last Name*
+                <input type="text" id="lname" name="lname" required>
+              </label>
+
+              <label for="street">
+                Street Address*
+                <input type="text" id="street" name="street" required>
+              </label>
+              
+              <label for="city">
+                City*
+                <input type="text" id="city" name="city" required>
+              </label>
+              
+              <label for="state">
+                State*
+                <input type="text" id="state" name="state" required>
+              </label>
+              
+              <label for="zip">
+                ZIP Code*
+                <input type="text" id="zip" name="zip" required>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Payment Information</legend>
+              
+              <label for="cardNumber">
+                Credit Card Number*
+                <input type="text" id="cardNumber" name="cardNumber" required 
+                       placeholder="1234 5678 9012 3456" maxlength="19">
+              </label>
+
+              <label for="expiration">
+                Expiration Date*
+                <input type="text" id="expiration" name="expiration" required 
+                       placeholder="MM/YY" maxlength="5">
+              </label>
+              
+              <label for="code">
+                Security Code*
+                <input type="text" id="code" name="code" required 
+                       placeholder="123" maxlength="4">
+              </label>
+            </fieldset>
+
+            <button type="submit" id="submit-order">Place Order</button>
+          </form>
+        </div>
       </section>
     </main>
 
+    <script src="../js/checkout.js"></script>
     <footer id="main-footer"></footer>
   </body>
 </html>

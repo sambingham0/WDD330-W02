@@ -15,11 +15,27 @@ function cartItemTemplate(item) {
   </li>`;
 }
 
+function calculateTotal(cartItems) {
+  return cartItems.reduce((total, item) => {
+    const price = parseFloat(item.FinalPrice || item.price || 0);
+    const quantity = parseInt(item.quantity || 1);
+    return total + (price * quantity);
+  }, 0);
+}
+
 export default function shoppingCartList(selector) {
   const el = document.querySelector(selector);
   el.innerHTML = "";
   const cartItems = getLocalStorage("so-cart") || [];
+  
   cartItems.forEach(item => {
     renderWithTemplate(cartItemTemplate, el, item);
   });
+  
+  // Calculate and display total
+  const total = calculateTotal(cartItems);
+  const totalElement = document.getElementById("cart-total");
+  if (totalElement) {
+    totalElement.textContent = `$${total.toFixed(2)}`;
+  }
 }
