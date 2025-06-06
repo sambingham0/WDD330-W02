@@ -2,9 +2,11 @@ import { getLocalStorage } from "./utils.mjs";
 import { renderWithTemplate } from "./utils.mjs";
 
 function cartItemTemplate(item) {
+  const imageUrl = item.Images?.PrimaryMedium || item.Images?.Primary || item.Image || '';
+
   return `<li class="cart-card divider">
     <a href="#" class="cart-card__image">
-      <img src="${item.Image}" alt="${item.Name}" />
+      <img src="${imageUrl}" alt="${item.Name}" />
     </a>
     <a href="#">
       <h2 class="card__name">${item.Name}</h2>

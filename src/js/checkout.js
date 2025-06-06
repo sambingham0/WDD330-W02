@@ -1,13 +1,14 @@
 import { loadHeaderFooter } from "./utils.mjs";
 import { getLocalStorage } from "./utils.mjs";
-import checkoutProcess from "./checkoutProcess.mjs";
+import CheckoutProcess from "./checkoutProcess.mjs";
 
 loadHeaderFooter();
 
+const checkout = new CheckoutProcess("so-cart", ".checkout-container");
+
 // Initialize checkout page
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize the checkout process
-  checkoutProcess.init("so-cart", ".checkout-container");
+  checkout.init();
   displayOrderSummary();
   setupFormHandlers();
 });
@@ -43,6 +44,12 @@ function setupFormHandlers() {
   // Format credit card number input
   cardNumberInput.addEventListener('input', (e) => {
     let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+    
+    // Limit to 16 digits
+    if (value.length > 16) {
+      value = value.substring(0, 16);
+    }
+    
     let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
     e.target.value = formattedValue;
   });
@@ -59,7 +66,7 @@ function setupFormHandlers() {
   // Calculate totals when zip code is entered
   zipInput.addEventListener('input', (e) => {
     if (e.target.value.length >= 5) {
-      checkoutProcess.calculateOrderTotal();
+      checkout.calculateOrderTotal();
     }
   });
   
@@ -67,63 +74,48 @@ function setupFormHandlers() {
   form.addEventListener('submit', handleFormSubmit);
 }
 
-function handleFormSubmit(event) {
+async function handleFormSubmit(event) {
   event.preventDefault();
   
   const form = event.target;
-  const formData = new FormData(form);
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
   
-  // Validate all required fields are filled
-  const requiredFields = form.querySelectorAll('[required]');
-  let isValid = true;
-  
-  requiredFields.forEach(field => {
-    if (!field.value.trim()) {
-      isValid = false;
-      field.style.borderColor = 'red';
-    } else {
-      field.style.borderColor = '';
+  try {
+    // Show loading state
+    submitButton.textContent = 'Processing...';
+    submitButton.disabled = true;
+    
+    // Calculate totals before checkout
+    checkout.calculateOrderTotal();
+    
+    // Process the checkout
+    const response = await checkout.checkout(form);
+    
+    console.log('Checkout successful:', response);
+    
+    // Show success message
+    alert('Order placed successfully!');
+    
+    // Clear cart and redirect
+    localStorage.removeItem('so-cart');
+    window.location.href = '../';
+    
+  } catch (error) {
+    console.error('Checkout failed:', error);
+    
+    // Show specific error message based on response
+    let errorMessage = 'There was an error processing your order. Please try again.';
+    if (error.message.includes('400')) {
+      errorMessage = 'Invalid order information. Please check your details.';
+    } else if (error.message.includes('500')) {
+      errorMessage = 'Server error. Please try again later.';
     }
-  });
-  
-  if (!isValid) {
-    alert('Please fill out all required fields.');
-    return;
+    
+    alert(errorMessage);
+    
+    // Re-enable submit button
+    submitButton.textContent = originalText;
+    submitButton.disabled = false;
   }
-  
-  // Prepare order data
-  const orderData = prepareOrderData(formData);
-  
-  // Here you would typically send the order to a server
-  console.log('Order data:', orderData);
-  
-  // For now, just show a success message
-  alert('Order placed successfully!');
-  
-  // Clear cart and redirect
-  localStorage.removeItem('so-cart');
-  window.location.href = '../';
-}
-
-function prepareOrderData(formData) {
-  const cartItems = getLocalStorage("so-cart") || [];
-  const totals = checkoutProcess.calculateOrderTotal();
-  
-  return {
-    orderDate: new Date().toISOString(),
-    fname: formData.get('fname'),
-    lname: formData.get('lname'),
-    street: formData.get('street'),
-    city: formData.get('city'),
-    state: formData.get('state'),
-    zip: formData.get('zip'),
-    cardNumber: formData.get('cardNumber'),
-    expiration: formData.get('expiration'),
-    code: formData.get('code'),
-    items: cartItems,
-    orderSubtotal: totals.subtotal,
-    orderTax: totals.tax,
-    orderTotal: totals.total,
-    shipping: totals.shipping
-  };
 }
