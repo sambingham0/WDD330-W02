@@ -1,5 +1,8 @@
-const baseURL = import.meta.env.VITE_SERVER_URL || 'http://server-nodejs.cit.byui.edu:3000/';
-const checkoutURL = import.meta.env.VITE_CHECKOUT_URL || 'http://server-nodejs.cit.byui.edu:3000/checkout';
+
+// Use Netlify proxy in production, otherwise use the original URL
+const isProd = window.location.hostname.endsWith('netlify.app');
+const baseURL = isProd ? '/api/' : (import.meta.env.VITE_SERVER_URL || 'http://server-nodejs.cit.byui.edu:3000/');
+const checkoutURL = isProd ? '/api/checkout' : (import.meta.env.VITE_CHECKOUT_URL || 'http://server-nodejs.cit.byui.edu:3000/checkout');
 
 async function convertToJson(res) {
   if (res.ok) {
@@ -66,6 +69,38 @@ export async function checkout(payload) {
   };
 
   const response = await fetch(checkoutURL, options);
+  const data = await convertToJson(response);
+  return data;
+}
+
+export async function loginRequest(creds) {
+  console.log('LoginRequest called with:', creds);
+  console.log('Making request to:', baseURL + 'login');
+  
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(creds)
+  };
+
+  const response = await fetch(baseURL + 'login', options);
+  console.log('Login response status:', response.status);
+  const data = await convertToJson(response);
+  console.log('Login response data:', data);
+  return data;
+}
+
+export async function getOrders(token) {
+  const options = {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  };
+
+  const response = await fetch(baseURL + 'orders', options);
   const data = await convertToJson(response);
   return data;
 }
