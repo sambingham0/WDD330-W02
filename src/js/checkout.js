@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Only initialize checkout process if we're on the checkout page
   if (window.location.pathname.includes('/checkout/') && !window.location.pathname.includes('/success')) {
     checkoutProcess.init("so-cart", ".checkout-container");
+    checkoutProcess.calculateOrdertotal();
     displayOrderSummary();
     setupFormHandlers();
   }
